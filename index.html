@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Flujo - Inventario Cíclico PanMi S.A.S.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a3a6c, #2c5282);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .flowchart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .flowchart-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c5282;
+            font-size: 22px;
+        }
+        
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        @media (min-width: 768px) {
+            .flowchart {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .step {
+                width: auto;
+                margin: 0 10px;
+            }
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background-color: #2c5282;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 6px rgba(44, 82, 130, 0.3);
+        }
+        
+        .step-content {
+            background: white;
+            border: 2px solid #2c5282;
+            border-radius: 12px;
+            padding: 20px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .step-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #2c5282;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .step-description {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .connector {
+            position: absolute;
+            z-index: 1;
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .connector {
+                display: block;
+                height: 4px;
+                background: linear-gradient(to right, #2c5282, #4299e1);
+                top: 60px;
+            }
+        }
+        
+        .connector-vertical {
+            position: absolute;
+            z-index: 1;
+            display: block;
+            width: 4px;
+            background: linear-gradient(to bottom, #2c5282, #4299e1);
+        }
+        
+        @media (min-width: 768px) {
+            .connector-vertical {
+                display: none;
+            }
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        
+        .details-panel {
+            background: #edf2f7;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .details-title {
+            color: #2c5282;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .details-content {
+            line-height: 1.7;
+        }
+        
+        .highlight {
+            background-color: #bee3f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .key-points {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        
+        .key-points li {
+            margin-bottom: 8px;
+        }
+        
+        .info-section {
+            background: #e6f7ff;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            border-radius: 0 6px 6px 0;
+            margin: 15px 0;
+        }
+        
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .benefit-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border-top: 3px solid #2c5282;
+        }
+        
+        .benefit-title {
+            font-weight: bold;
+            color: #2c5282;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #718096;
+            font-size: 14px;
+            padding: 20px;
+        }
+        
+        .highlight-blue {
+            background-color: #dbeafe;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .highlight-green {
+            background-color: #c6f6d5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .highlight-orange {
+            background-color: #fed7d7;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .highlight-purple {
+            background-color: #e9d8fd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .highlight-teal {
+            background-color: #b2f5ea;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .highlight-yellow {
+            background-color: #fefcbf;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .flowchart-container {
+                padding: 20px 10px;
+            }
+            
+            .step-content {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Flujo de Trabajo del Inventario Cíclico</h1>
+            <p class="subtitle">Diagrama de flujo para la gestión de inventarios en PanMi S.A.S. sin interrumpir las operaciones diarias</p>
+        </header>
+        
+        <div class="flowchart-container">
+            <h2 class="flowchart-title">Proceso Completo de Inventario Cíclico</h2>
+            
+            <div class="flowchart" id="flowchart">
+                <!-- Conectores horizontales -->
+                <div class="connector" id="connector1" style="width: 12%; left: 17%;"></div>
+                <div class="connector" id="connector2" style="width: 12%; left: 34%;"></div>
+                <div class="connector" id="connector3" style="width: 12%; left: 51%;"></div>
+                <div class="connector" id="connector4" style="width: 12%; left: 68%;"></div>
+                <div class="connector" id="connector5" style="width: 12%; left: 85%;"></div>
+                
+                <!-- Conectores verticales para móviles -->
+                <div class="connector-vertical" id="connector-v1" style="height: 40px; top: 100px; left: 50%;"></div>
+                <div class="connector-vertical" id="connector-v2" style="height: 40px; top: 205px; left: 50%;"></div>
+                <div class="connector-vertical" id="connector-v3" style="height: 40px; top: 310px; left: 50%;"></div>
+                <div class="connector-vertical" id="connector-v4" style="height: 40px; top: 415px; left: 50%;"></div>
+                <div class="connector-vertical" id="connector-v5" style="height: 40px; top: 520px; left: 50%;"></div>
+                
+                <!-- Paso 1: Programación -->
+                <div class="step" onclick="showDetails(1)">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Programación</div>
+                        <div class="step-description">
+                            Planificación de las fechas, horarios y productos a contar según la clasificación ABC
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 2: Preparación -->
+                <div class="step" onclick="showDetails(2)">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Preparación</div>
+                        <div class="step-description">
+                            Organización de zonas, asignación de personal y preparación de herramientas y dispositivos
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 3: Conteo físico -->
+                <div class="step" onclick="showDetails(3)">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Conteo físico</div>
+                        <div class="step-description">
+                            Verificación física de las existencias en el almacén durante los periodos de menor actividad
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 4: Registro en aplicación -->
+                <div class="step" onclick="showDetails(4)">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Registro en aplicación</div>
+                        <div class="step-description">
+                            Ingreso inmediato de los datos contados mediante dispositivos móviles con aplicación especializada
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 5: Comparación con sistema -->
+                <div class="step" onclick="showDetails(5)">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Comparación con sistema</div>
+                        <div class="step-description">
+                            Sincronización y validación de los datos contados con los registros del sistema de inventario
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 6: Análisis de diferencias -->
+                <div class="step" onclick="showDetails(6)">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <div class="step-title">Análisis de diferencias</div>
+                        <div class="step-description">
+                            Identificación de causas de discrepancias y evaluación de su magnitud y frecuencia
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paso 7: Acciones correctivas -->
+                <div class="step" onclick="showDetails(7)">
+                    <div class="step-number">7</div>
+                    <div class="step-content">
+                        <div class="step-title">Acciones correctivas</div>
+                        <div class="step-description">
+                            Implementación de medidas para corregir problemas y prevenir futuras discrepancias
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2c5282;"></div>
+                    <span>Pasos del proceso</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(to right, #2c5282, #4299e1);"></div>
+                    <span>Flujo de trabajo</span>
+                </div>
+            </div>
+            
+            <div class="details-panel" id="details-panel">
+                <div class="details-title" id="details-title">
+                    <span id="details-number">1</span>
+                    <span id="details-main-title">Programación</span>
+                </div>
+                <div class="details-content" id="details-content">
+                    <!-- El contenido se llenará dinámicamente con JavaScript -->
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <strong>Nota:</strong> Haga clic en cualquier paso del proceso para ver detalles específicos sobre su implementación en PanMi S.A.S.
+            </div>
+            
+            <h3 style="color: #2c5282; margin: 25px 0 15px;">Beneficios clave del sistema de inventario cíclico</h3>
+            <div class="benefits">
+                <div class="benefit-card">
+                    <div class="benefit-title">✓ Continuidad operativa</div>
+                    <p>Permite realizar conteos sin cerrar los puntos de venta, manteniendo la disponibilidad de productos para los clientes.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-title">✓ Enfoque ABC</div>
+                    <p>Asigna frecuencias de conteo diferenciadas según la importancia de cada producto (diario para categoría A, cada 3 días para B, semanal para C).</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-title">✓ Reducción de mermas</div>
+                    <p>Permite identificar y corregir problemas antes de que se conviertan en pérdidas significativas, reduciendo las mermas del 7,6% al 3,5%.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-title">✓ Mejora continua</div>
+                    <p>El análisis constante de diferencias permite implementar acciones correctivas y optimizar continuamente los procesos.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Diagrama de flujo del proceso de inventario cíclico para PanMi S.A.S. | Basado en el informe GA3-210101062-AA1-EV02</p>
+            <p>Implementación de un modelo de inventario sin cerrar los puntos de ventas de la empresa</p>
+        </footer>
+    </div>
+
+    <script>
+        // Detalles para cada paso del proceso
+        const stepDetails = [
+            {
+                title: "Programación",
+                content: `
+                    <p>La <span class="highlight-blue">programación</span> es el primer paso fundamental en el sistema de inventario cíclico para PanMi S.A.S. Este proceso implica:</p>
+                    
+                    <ul class="key-points">
+                        <li>Establecer un <span class="highlight">calendario de conteos</span> basado en la clasificación ABC de inventarios previamente definida</li>
+                        <li>Programar los conteos durante los <span class="highlight">periodos de menor actividad</span> para minimizar el impacto en las operaciones</li>
+                        <li>Asignar responsables específicos para cada conteo</li>
+                        <li>Definir las zonas de almacenamiento a contar en cada jornada</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> La programación se realiza semanalmente, considerando los patrones de demanda. Los conteos de categoría A (pan blanco tradicional y pan de queso) se programan diariamente al finalizar la jornada (7:00 p.m. - 9:00 p.m.), los de categoría B (pan de yuca) cada 3 días durante el periodo de menor actividad (2:00 p.m. - 3:00 p.m.), y los de categoría C semanalmente los lunes por la mañana (6:00 a.m. - 7:30 a.m.).
+                    </div>
+                `
+            },
+            {
+                title: "Preparación",
+                content: `
+                    <p>La <span class="highlight-blue">preparación</span> asegura que los conteos se realicen de manera eficiente y precisa. Incluye:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Organización de zonas</span> de almacenamiento con señalización clara por categorías (A, B, C)</li>
+                        <li><span class="highlight">Capacitación del personal</span> en técnicas de conteo y uso de dispositivos móviles</li>
+                        <li><span class="highlight">Preparación de herramientas</span> necesarias (dispositivos con aplicación, códigos QR, balanzas)</li>
+                        <li><span class="highlight">Verificación de equipos</span> y materiales antes del conteo</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> La preparación incluye la organización de zonas específicas para cada categoría de producto, la capacitación de 2 horas para los encargados de inventario, y la configuración de dispositivos móviles con la aplicación especializada. Los productos de categoría A se ubican en zonas de fácil acceso para facilitar los conteos diarios.
+                    </div>
+                `
+            },
+            {
+                title: "Conteo físico",
+                content: `
+                    <p>El <span class="highlight-blue">conteo físico</span> es la verificación directa de las existencias en el almacén. Este paso implica:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Escaneo de códigos QR</span> para identificación automática de productos</li>
+                        <li><span class="highlight">Conteo preciso de unidades</span> o pesaje para productos a granel</li>
+                        <li><span class="highlight">Registro inmediato</span> de los resultados en el momento del conteo</li>
+                        <li><span class="highlight">Documentación visual</span> mediante fotografías de las zonas contadas</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> El conteo físico se realiza durante los periodos de menor actividad para minimizar la interrupción. Para el pan blanco tradicional y pan de queso (categoría A), el conteo se hace diariamente al finalizar la jornada. Los empleados utilizan dispositivos móviles para escanear códigos QR y registrar las cantidades, con especial atención a la vida útil de los productos.
+                    </div>
+                `
+            },
+            {
+                title: "Registro en aplicación",
+                content: `
+                    <p>El <span class="highlight-blue">registro en aplicación</span> garantiza la inmediatez y precisión de los datos recopilados. Incluye:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Ingreso en tiempo real</span> de los datos contados mediante dispositivos móviles</li>
+                        <li><span class="highlight">Sincronización automática</span> con el sistema central de gestión de inventarios</li>
+                        <li><span class="highlight">Validación de datos</span> para detectar errores en el momento</li>
+                        <li><span class="highlight">Generación de reportes preliminares</span> de las existencias contadas</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> Se utiliza una aplicación móvil especializada que permite escanear códigos QR de los productos, ingresar las cantidades contadas y sincronizar inmediatamente con el sistema central. La aplicación incluye validaciones para prevenir errores de digitación y genera alertas cuando las cantidades difieren significativamente de los registros del sistema.
+                    </div>
+                `
+            },
+            {
+                title: "Comparación con sistema",
+                content: `
+                    <p>La <span class="highlight-blue">comparación con sistema</span> es esencial para identificar discrepancias entre la realidad física y los registros. Este paso implica:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Análisis automático</span> de diferencias entre el conteo físico y los registros del sistema</li>
+                        <li><span class="highlight">Clasificación de diferencias</span> por magnitud (menor al 2%, entre 2-5%, mayor al 5%)</li>
+                        <li><span class="highlight">Generación de alertas</span> para diferencias que requieren atención inmediata</li>
+                        <li><span class="highlight">Documentación de todas las discrepancias</span> para análisis posterior</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> La aplicación genera automáticamente un reporte de diferencias al sincronizar los datos. Las diferencias menores al 2% se ajustan inmediatamente en el sistema, las entre 2-5% requieren revisión del supervisor, y las mayores al 5% desencadenan una investigación profunda. Este proceso se realiza diariamente para la categoría A y semanalmente para las demás categorías.
+                    </div>
+                `
+            },
+            {
+                title: "Análisis de diferencias",
+                content: `
+                    <p>El <span class="highlight-blue">análisis de diferencias</span> permite identificar las causas raíz de las discrepancias. Incluye:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Clasificación de causas</span> (errores de registro, mermas normales, robos, errores de producción)</li>
+                        <li><span class="highlight">Identificación de patrones</span> y tendencias en las diferencias</li>
+                        <li><span class="highlight">Análisis de frecuencia</span> y magnitud de las discrepancias por producto y categoría</li>
+                        <li><span class="highlight">Documentación detallada</span> de cada diferencia con evidencia de soporte</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> El análisis se realiza diariamente para la categoría A y semanalmente para las demás. Se identifican las causas específicas de cada diferencia (por ejemplo, merma por vida útil en pan de yuca, errores en registro de ventas para pan blanco). Los resultados se utilizan para ajustar los procesos y reducir futuras discrepancias.
+                    </div>
+                `
+            },
+            {
+                title: "Acciones correctivas",
+                content: `
+                    <p>Las <span class="highlight-blue">acciones correctivas</span> son fundamentales para mejorar continuamente el sistema. Este paso implica:</p>
+                    
+                    <ul class="key-points">
+                        <li><span class="highlight">Implementación de medidas</span> específicas para corregir las causas identificadas</li>
+                        <li><span class="highlight">Ajuste de procedimientos</span> y políticas según los hallazgos del análisis</li>
+                        <li><span class="highlight">Capacitación adicional</span> del personal cuando sea necesario</li>
+                        <li><span class="highlight">Seguimiento continuo</span> para verificar la efectividad de las acciones implementadas</li>
+                    </ul>
+                    
+                    <div class="info-section">
+                        <strong>Para PanMi S.A.S.:</strong> Las acciones correctivas pueden incluir ajustes en los horarios de producción, mejoras en el proceso de registro de ventas, capacitación adicional para el personal, o cambios en el manejo de productos perecederos. Cada acción se documenta y se monitorea para evaluar su impacto en la reducción de mermas y la precisión del inventario.
+                    </div>
+                `
+            }
+        ];
+        
+        // Función para mostrar los detalles de un paso
+        function showDetails(stepNumber) {
+            const detailsPanel = document.getElementById('details-panel');
+            const detailsTitle = document.getElementById('details-title');
+            const detailsNumber = document.getElementById('details-number');
+            const detailsMainTitle = document.getElementById('details-main-title');
+            const detailsContent = document.getElementById('details-content');
+            
+            // Actualizar el contenido
+            detailsNumber.textContent = stepNumber;
+            detailsMainTitle.textContent = stepDetails[stepNumber-1].title;
+            detailsContent.innerHTML = stepDetails[stepNumber-1].content;
+            
+            // Mostrar el panel
+            detailsPanel.style.display = 'block';
+            
+            // Resaltar el paso actual
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index === stepNumber-1) {
+                    step.querySelector('.step-content').style.backgroundColor = '#dbeafe';
+                    step.querySelector('.step-content').style.borderColor = '#3182ce';
+                } else {
+                    step.querySelector('.step-content').style.backgroundColor = 'white';
+                    step.querySelector('.step-content').style.borderColor = '#2c5282';
+                }
+            });
+        }
+        
+        // Inicializar mostrando los detalles del primer paso
+        document.addEventListener('DOMContentLoaded', function() {
+            showDetails(1);
+        });
+    </script>
+</body>
+</html>
